@@ -1,4 +1,5 @@
 node_modules/
+.gitignore
 
 # Arquivos de desenvolvimento gerados automaticamente pelo navegador (Vite)
 .vite/
