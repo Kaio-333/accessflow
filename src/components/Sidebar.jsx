@@ -1,11 +1,11 @@
 import React from 'react'
 
 const NAV_LINKS = [
-  { id:'landing', section:'',         icon:'home',        label:'Início',         tooltip:'Início' },
-  { id:'landing', section:'features', icon:'extension',   label:'Recursos',       tooltip:'Recursos' },
-  { id:'landing', section:'howworks', icon:'help_circle', label:'Como funciona',  tooltip:'Como funciona' },
-  { id:'login',   section:'',         icon:'login',       label:'Login',          tooltip:'Login' },
-  { id:'sandbox', section:'',         icon:'science',     label:'Sandbox',        tooltip:'Sandbox' },
+  { id: 'landing', section: '', icon: 'home', label: 'Início', tooltip: 'Início' },
+  { id: 'landing', section: 'features', icon: 'extension', label: 'Recursos', tooltip: 'Recursos' },
+  { id: 'landing', section: 'howworks', icon: 'help', label: 'Como funciona', tooltip: 'Como funciona' },
+  { id: 'login', section: '', icon: 'login', label: 'Login', tooltip: 'Login' },
+  { id: 'sandbox', section: '', icon: 'science', label: 'Sandbox', tooltip: 'Sandbox' },
 ]
 
 export default function Sidebar({ currentView, onNavigate }) {
