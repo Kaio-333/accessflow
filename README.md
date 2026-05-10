@@ -1,49 +1,112 @@
-# AccessFlow - Projeto Vite + React
+# 💜 AccessFlow
 
-## Início rápido
+<div align="center">
+
+<img src="https://img.shields.io/badge/React-7C3AED?style=for-the-badge&logo=react&logoColor=white"/>
+<img src="https://img.shields.io/badge/Vite-8B5CF6?style=for-the-badge&logo=vite&logoColor=white"/>
+<img src="https://img.shields.io/badge/Node.js-A855F7?style=for-the-badge&logo=node.js&logoColor=white"/>
+
+<br/>
+
+###  Uma experiência moderna de acessibilidade para a web
+
+</div>
+
+---
+
+#  Sobre o projeto
+
+O **AccessFlow** é uma plataforma desenvolvida para demonstrar recursos de acessibilidade em páginas web de forma simples, visual e interativa.
+
+A aplicação permite carregar sites externos dentro de um sandbox e aplicar funcionalidades de acessibilidade em tempo real, simulando o funcionamento de uma extensão moderna de navegador.
+
+---
+
+#  Tecnologias
+
+* ⚛️ React
+* ⚡ Vite
+* 🟣 Node.js
+
+---
+
+#  Início rápido
 
 ```bash
 npm install
-npm run dev      # Vite em http://127.0.0.1:5173 + proxy em http://127.0.0.1:5174
-npm run build    # dist/
+npm run dev
 ```
 
-## Arquitetura
+###  Ambientes
 
-O projeto usa React no front-end e um proxy Node simples para a renderização do sandbox.
+```txt
+Front-end: http://127.0.0.1:5173
+Proxy:      http://127.0.0.1:5174
+```
 
-```text
+---
+
+#  Estrutura do projeto
+
+```txt
 src/
-  App.jsx                       # Layout principal e navegação
-  main.jsx                      # Entrada React
-  data/
-    features.js                 # Recursos da landing page
-  lib/
-    accessflowBridge.js         # Ponte injetada em páginas renderizadas
-    accessflowConfig.js         # Presets e normalização de URLs
-  components/
-    BeforeAfter.jsx             # Comparativo interativo
-    Sidebar.jsx                 # Navegação lateral
-  views/
-    Landing.jsx                 # Página inicial
-    Login.jsx                   # Tela de login
-    Sandbox.jsx                 # Controles + iframe de renderização
-  styles/
-    main.css                    # Tokens, sidebar e layout global
-    landing.css                 # Landing page
-    views.css                   # Login e sandbox
+ ├── 📁 components/
+ ├── 📁 views/
+ ├── 📁 styles/
+ ├── 📁 lib/
+ └── 📁 data/
 
 server/
-  dev.js                        # Sobe Vite e proxy juntos
-  proxy-server.js               # Busca HTML externo e injeta a ponte AccessFlow
+ ├── ⚙️ dev.js
+ └── 🌐 proxy-server.js
 ```
 
-## Sandbox
+---
 
-O sandbox aceita:
+#  Sandbox
 
-- URL externa, renderizada por `/api/render?url=...` dentro de um `iframe`.
-- HTML colado diretamente no campo, renderizado via `srcDoc`.
-- Exemplo local, útil quando a página externa bloqueia scripts ou exige login.
+O sandbox permite:
 
-Alguns sites ainda podem falhar parcialmente por autenticação, scripts próprios, CORS de APIs internas ou proteções contra automação. Para um TCC, essa abordagem é demonstrável, profissional e mais próxima de um produto real do que um preview estático.
+*  Renderizar URLs externas
+*  Testar HTML personalizado
+*  Aplicar acessibilidade em tempo real
+*  Demonstrar funcionalidades visualmente
+
+---
+
+#  Recursos de acessibilidade
+
+*  Alto contraste
+*  Escala de fonte
+*  Melhor legibilidade
+*  Navegação assistiva
+*  Interface adaptável
+
+---
+
+#  Diferenciais
+
+*  Renderização dinâmica de páginas reais
+*  Sistema de proxy próprio
+*  Interface moderna
+*  Estrutura organizada
+*  Demonstração prática de acessibilidade
+
+---
+
+#  Futuras melhorias
+
+*  Leitor de voz
+*  IA para acessibilidade
+*  Extensão de navegador
+*  Auditoria automática WCAG
+
+---
+
+<div align="center">
+
+# 💜 AccessFlow
+
+### Tornando a web mais acessível para todos.
+
+</div>
