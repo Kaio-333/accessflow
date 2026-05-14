@@ -1,6 +1,22 @@
 import React from 'react'
 
-const NAV_LINKS = [
+interface NavLink {
+  id: string
+  section: string
+  icon: string
+  label: string
+  tooltip: string
+}
+
+interface SidebarProps {
+  currentView: string
+  currentSection: string | null
+  onNavigate: (view: string, section: string | null) => void
+  collapsed: boolean
+  onToggleCollapse: () => void
+}
+
+const NAV_LINKS: NavLink[] = [
   { id: 'landing', section: '', icon: 'home', label: 'Início', tooltip: 'Início' },
   { id: 'landing', section: 'features', icon: 'extension', label: 'Recursos', tooltip: 'Recursos' },
   { id: 'landing', section: 'howworks', icon: 'help', label: 'Como funciona', tooltip: 'Como funciona' },
@@ -8,7 +24,7 @@ const NAV_LINKS = [
   { id: 'sandbox', section: '', icon: 'science', label: 'Sandbox', tooltip: 'Sandbox' },
 ]
 
-export default function Sidebar({ currentView, onNavigate }) {
+export default function Sidebar({ currentView, currentSection, onNavigate, collapsed, onToggleCollapse }: SidebarProps) {
   return (
     <div className="sidebar-inner">
       <div className="sidebar-logo">
@@ -22,8 +38,9 @@ export default function Sidebar({ currentView, onNavigate }) {
       </div>
 
       <ul className="sidebar-nav" role="list">
-        {NAV_LINKS.map(link => {
-          const active = link.id === currentView
+        {NAV_LINKS.map((link) => {
+          const linkSection = link.section || null
+          const active = link.id === currentView && linkSection === currentSection
           return (
             <li role="listitem" key={`${link.id}-${link.section || 'root'}`}>
               <button
@@ -49,6 +66,7 @@ export default function Sidebar({ currentView, onNavigate }) {
           <span className="nav-link-label">Baixar extensão</span>
         </button>
       </div>
+
     </div>
   )
 }

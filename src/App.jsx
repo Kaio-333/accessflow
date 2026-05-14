@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import Sidebar from './components/Sidebar.jsx'
+import Sidebar from './components/Sidebar.tsx'
 import Landing from './views/Landing.jsx'
 import Login from './views/Login.jsx'
 import Sandbox from './views/Sandbox.jsx'
@@ -8,6 +8,7 @@ export default function App() {
   const [view, setView] = useState('landing')
   const [section, setSection] = useState(null)
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
   useEffect(() => {
     function closeOnEscape(event) {
@@ -57,9 +58,26 @@ export default function App() {
         <span className="material-symbols-outlined">menu</span>
       </button>
 
-      <nav id="sidebar" className={`sidebar ${sidebarOpen ? 'open' : ''}`} role="navigation" aria-label="Navegação principal">
-        <Sidebar currentView={view} onNavigate={navigate} />
+      <nav id="sidebar" className={`sidebar ${sidebarOpen ? 'open' : ''} ${sidebarCollapsed ? 'collapsed' : ''}`} role="navigation" aria-label="Navegação principal">
+        <Sidebar
+          currentView={view}
+          currentSection={section}
+          onNavigate={navigate}
+          collapsed={sidebarCollapsed}
+          onToggleCollapse={() => setSidebarCollapsed(c => !c)}
+        />
       </nav>
+
+      <button
+        className={`sidebar-toggle ${sidebarCollapsed ? 'sidebar-toggle--collapsed' : ''}`}
+        onClick={() => setSidebarCollapsed(c => !c)}
+        aria-label={sidebarCollapsed ? 'Expandir sidebar' : 'Recolher sidebar'}
+        title={sidebarCollapsed ? 'Expandir' : 'Recolher'}
+      >
+        <span className="material-symbols-outlined">
+          {sidebarCollapsed ? 'chevron_right' : 'chevron_left'}
+        </span>
+      </button>
 
       <div
         id="mobile-overlay"
