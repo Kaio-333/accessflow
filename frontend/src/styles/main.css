@@ -255,6 +255,92 @@ ul { list-style: none; }
 
 :focus-visible { outline: 2px solid var(--primary-c); outline-offset: 3px; border-radius: var(--r-sm); }
 
+/* === GLOBAL LOGIN BUTTON (top-right) === */
+.global-login-btn {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 250;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  border-radius: var(--r-full);
+  background: var(--surface-high);
+  border: 1px solid var(--outline-var);
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: all var(--t);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+  backdrop-filter: blur(8px);
+}
+.global-login-btn .material-symbols-outlined {
+  font-size: 20px;
+  color: var(--primary-c);
+  transition: color var(--t);
+}
+.global-login-btn:hover {
+  background: var(--primary-c);
+  border-color: var(--primary-c);
+  color: white;
+  box-shadow: 0 4px 20px rgba(153,81,230,0.4);
+  transform: translateY(-1px);
+}
+.global-login-btn:hover .material-symbols-outlined {
+  color: white;
+}
+.global-login-btn:active {
+  transform: translateY(0) scale(0.97);
+}
+
+/* === SANDBOX RESIZE HANDLE === */
+.ae-resize-handle {
+  width: 8px;
+  flex-shrink: 0;
+  cursor: col-resize;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: background 0.18s;
+}
+.ae-resize-handle::before {
+  content: '';
+  position: absolute;
+  inset: 0 -4px;
+  z-index: 1;
+}
+.ae-resize-handle:hover,
+.ae-resize-handle.active {
+  background: rgba(153,81,230,0.15);
+}
+.ae-resize-grip {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 4px;
+  pointer-events: none;
+}
+.ae-resize-grip::before,
+.ae-resize-grip::after {
+  content: '';
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--outline-var);
+  transition: background 0.18s;
+}
+.ae-resize-handle:hover .ae-resize-grip::before,
+.ae-resize-handle:hover .ae-resize-grip::after,
+.ae-resize-handle.active .ae-resize-grip::before,
+.ae-resize-handle.active .ae-resize-grip::after {
+  background: var(--primary-c);
+}
+
 /* === ANIMATIONS === */
 @keyframes fadeIn   { from { opacity: 0; } to { opacity: 1; } }
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -278,6 +364,8 @@ ul { list-style: none; }
   .nav-link:hover::after { opacity: 1; }
   .main-content { margin-left: var(--sidebar-slim); }
   .sidebar-toggle { display: none; }
+  .global-login-label { display: none; }
+  .global-login-btn { padding: 8px 10px; }
 }
 @media (max-width: 768px) {
   .sidebar { transform: translateX(-100%); width: var(--sidebar-width); }
@@ -292,4 +380,5 @@ ul { list-style: none; }
   .main-content { margin-left: 0; }
   .nav-link::after { display: none; }
   .sidebar-toggle { display: none; }
+  .ae-resize-handle { display: none; }
 }

@@ -3,6 +3,8 @@ import Sidebar from './components/Sidebar.tsx'
 import Landing from './views/Landing.jsx'
 import Login from './views/Login.jsx'
 import Sandbox from './views/Sandbox.jsx'
+import Changelog from './views/Changelog.jsx'
+import DifficultyProfile from './views/DifficultyProfile.jsx'
 
 export default function App() {
   const [view, setView] = useState('landing')
@@ -48,6 +50,19 @@ export default function App() {
 
   return (
     <>
+      {/* Global login button — top-right on all pages */}
+      {view !== 'login' && (
+        <button
+          id="global-login-btn"
+          className="global-login-btn"
+          aria-label="Ir para login"
+          onClick={() => navigate('login')}
+        >
+          <span className="material-symbols-outlined">account_circle</span>
+          <span className="global-login-label">Entrar</span>
+        </button>
+      )}
+
       <button
         id="hamburger"
         className="hamburger"
@@ -90,6 +105,8 @@ export default function App() {
         {view === 'landing' && <Landing onNavigate={navigate} />}
         {view === 'login' && <Login />}
         {view === 'sandbox' && <Sandbox />}
+        {view === 'changelog' && <Changelog />}
+        {view === 'difficulty-profile' && <DifficultyProfile />}
       </main>
     </>
   )
