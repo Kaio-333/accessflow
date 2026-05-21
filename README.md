@@ -1,4 +1,4 @@
-# 💜 AccessFlow
+# 💜 Swim
 
 <div align="center">
 
@@ -16,7 +16,7 @@
 
 #  Sobre o projeto
 
-O **AccessFlow** é uma plataforma desenvolvida para demonstrar recursos de acessibilidade em páginas web de forma simples, visual e interativa.
+O **Swim** é uma plataforma desenvolvida para demonstrar recursos de acessibilidade em páginas web de forma simples, visual e interativa.
 
 A aplicação permite carregar sites externos dentro de um sandbox e aplicar funcionalidades de acessibilidade em tempo real, simulando o funcionamento de uma extensão moderna de navegador.
 
@@ -105,8 +105,8 @@ O sandbox permite:
 
 <div align="center">
 
-# 💜 AccessFlow
+# 💜 Swim
 
-### Tornando a web mais acessível para todos.
+### Tornando a web mais navegável para todos.
 
 </div>
