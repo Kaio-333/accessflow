@@ -21,8 +21,37 @@ export default function Sandbox() {
   const [frameReady, setFrameReady] = useState(false)
   const [mouseY, setMouseY] = useState(0)
   const [progress, setProgress] = useState(0)
+  const [settingsWidth, setSettingsWidth] = useState(320)
+  const [isDragging, setIsDragging] = useState(false)
   const iframeRef = useRef(null)
   const viewportRef = useRef(null)
+  const dragRef = useRef(null)
+
+  // Resizable settings panel
+  useEffect(() => {
+    if (!isDragging) return
+    function onMouseMove(e) {
+      // Calculate width relative to the ae-body container
+      const body = dragRef.current?.parentElement
+      if (!body) return
+      const bodyRect = body.getBoundingClientRect()
+      const newWidth = Math.min(600, Math.max(240, e.clientX - bodyRect.left))
+      setSettingsWidth(newWidth)
+    }
+    function onMouseUp() {
+      setIsDragging(false)
+      document.body.style.cursor = ''
+      document.body.style.userSelect = ''
+    }
+    document.body.style.cursor = 'col-resize'
+    document.body.style.userSelect = 'none'
+    window.addEventListener('mousemove', onMouseMove)
+    window.addEventListener('mouseup', onMouseUp)
+    return () => {
+      window.removeEventListener('mousemove', onMouseMove)
+      window.removeEventListener('mouseup', onMouseUp)
+    }
+  }, [isDragging])
 
   const iframeSrc = renderTarget.mode === 'external'
     ? `/api/render?url=${encodeURIComponent(renderTarget.url)}`
@@ -160,15 +189,11 @@ export default function Sandbox() {
         <div className="ae-topbar-right">
           <button className="ae-icon-btn" aria-label="Configurações"><span className="material-symbols-outlined">settings</span></button>
           <button className="ae-icon-btn" aria-label="Conta"><span className="material-symbols-outlined">account_circle</span></button>
-          <button className="ae-download-btn">
-            <span className="material-symbols-outlined" style={{ fontSize:18 }}>download</span>
-            Baixar extensão
-          </button>
         </div>
       </header>
 
       <div className="ae-body">
-        <aside className="ae-settings">
+        <aside className="ae-settings" style={{ width: settingsWidth, minWidth: 240, maxWidth: 600 }}>
           <div className="ae-settings-header">
             <p className="ae-settings-title">Personalizar experiência</p>
             <p className="ae-settings-subtitle">Ajuste os parâmetros para simular diferentes necessidades de leitura.</p>
@@ -235,6 +260,18 @@ export default function Sandbox() {
             <button className="ae-btn-reset" onClick={resetState}>Restaurar padrões</button>
           </div>
         </aside>
+
+        <div
+          className={`ae-resize-handle ${isDragging ? 'active' : ''}`}
+          ref={dragRef}
+          onMouseDown={(e) => { e.preventDefault(); setIsDragging(true) }}
+          role="separator"
+          aria-orientation="vertical"
+          aria-label="Redimensionar painel de configurações"
+          tabIndex={0}
+        >
+          <span className="ae-resize-grip" />
+        </div>
 
         <section className="ae-preview">
           <div className="ae-preview-card">
