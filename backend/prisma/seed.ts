@@ -1,11 +1,19 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client"
+import { PrismaPg } from "@prisma/adapter-pg"
+import bcrypt from "bcrypt"
+import "dotenv/config"
 
-const prisma = new PrismaClient();
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! })
+const prisma = new PrismaClient({ adapter })
 
 async function main() {
+    const senhaHugo = await bcrypt.hash("123456", 10)
+    const senhaMaria = await bcrypt.hash("123456", 10)
+
     await prisma.users.create({
         data: {
             email: "hugo@example.com",
+            password: senhaHugo,
             profile: {
                 create: {
                     name: "Hugo",
@@ -17,10 +25,10 @@ async function main() {
             },
         },
     });
-
     await prisma.users.create({
         data: {
             email: "maria@example.com",
+            password: senhaMaria,
             profile: {
                 create: {
                     name: "Maria",
@@ -32,7 +40,6 @@ async function main() {
             },
         },
     });
-
     console.log("Seed executado com sucesso!");
 }
 

@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import Sidebar from './components/Sidebar.tsx'
-import Landing from './views/Landing.jsx'
-import Login from './views/Login.jsx'
-import Sandbox from './views/Sandbox.jsx'
-import Changelog from './views/Changelog.jsx'
-import DifficultyProfile from './views/DifficultyProfile.jsx'
+import Sidebar from './components/layout/Sidebar.tsx'
+import Landing from './pages/Landing.jsx'
+import Login from './pages/Login.jsx'
+import Sandbox from './pages/Sandbox.jsx'
+import Changelog from './pages/Changelog.jsx'
+import DifficultyProfile from './pages/DifficultyProfile.jsx'
 
 export default function App() {
   const [view, setView] = useState('landing')
