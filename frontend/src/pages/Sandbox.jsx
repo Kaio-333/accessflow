@@ -17,7 +17,7 @@ const FONT_MAP = {
 export default function Sandbox() {
   const [state, setState] = useState(DEFAULT_ACCESSFLOW_STATE)
   const [input, setInput] = useState('')
-  const [renderTarget, setRenderTarget] = useState({ mode:'demo', url:'', srcDoc:'' })
+  const [renderTarget, setRenderTarget] = useState({ mode: 'demo', url: '', srcDoc: '' })
   const [frameReady, setFrameReady] = useState(false)
   const [mouseY, setMouseY] = useState(0)
   const [progress, setProgress] = useState(0)
@@ -87,7 +87,7 @@ export default function Sandbox() {
 
   useEffect(() => {
     if (renderTarget.mode === 'demo') return
-    iframeRef.current?.contentWindow?.postMessage({ type:'ACCESSFLOW_APPLY_STATE', state }, '*')
+    iframeRef.current?.contentWindow?.postMessage({ type: 'ACCESSFLOW_APPLY_STATE', state }, '*')
   }, [state, renderTarget, frameReady])
 
   useEffect(() => {
@@ -102,7 +102,7 @@ export default function Sandbox() {
   }
 
   function patchState(partial) {
-    setState(current => ({ ...current, ...partial, preset:'none' }))
+    setState(current => ({ ...current, ...partial, preset: 'none' }))
   }
 
   function resetState() {
@@ -113,14 +113,14 @@ export default function Sandbox() {
     event.preventDefault()
     const value = input.trim()
     if (!value) {
-      setRenderTarget({ mode:'demo', url:'', srcDoc:'' })
+      setRenderTarget({ mode: 'demo', url: '', srcDoc: '' })
       return
     }
 
     if (looksLikeHTML(value)) {
       setRenderTarget({
-        mode:'html',
-        url:'',
+        mode: 'html',
+        url: '',
         srcDoc: injectAccessflowBridge(value),
       })
       return
@@ -128,12 +128,12 @@ export default function Sandbox() {
 
     try {
       const url = normalizePageUrl(value)
-      setRenderTarget({ mode:'external', url, srcDoc:'' })
+      setRenderTarget({ mode: 'external', url, srcDoc: '' })
       setInput(url)
     } catch {
       setRenderTarget({
-        mode:'html',
-        url:'',
+        mode: 'html',
+        url: '',
         srcDoc: buildMessageDocument('URL inválida', 'Informe uma URL com domínio válido, como https://example.com.'),
       })
     }
@@ -164,7 +164,7 @@ export default function Sandbox() {
       },
     }
     const anchor = document.createElement('a')
-    anchor.href = URL.createObjectURL(new Blob([JSON.stringify(config, null, 2)], { type:'application/json' }))
+    anchor.href = URL.createObjectURL(new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' }))
     anchor.download = 'accessflow-configuracao-aether.json'
     anchor.click()
     URL.revokeObjectURL(anchor.href)
@@ -179,7 +179,7 @@ export default function Sandbox() {
 
   return (
     <div className="ae-sandbox-view" onMouseMove={event => setMouseY(event.clientY - 18)}>
-      {state.readingRuler && <div className="ae-reading-ruler" aria-hidden="true" style={{ display:'block', top:mouseY }} />}
+      {state.readingRuler && <div className="ae-reading-ruler" aria-hidden="true" style={{ display: 'block', top: mouseY }} />}
 
       <header className="ae-topbar">
         <div className="ae-topbar-left">
@@ -213,7 +213,7 @@ export default function Sandbox() {
               <div className="ae-section-title"><span className="material-symbols-outlined">match_case</span>Tipografia</div>
               <div className="ae-select-wrap">
                 <label className="ae-label" htmlFor="ae-font-select">Família da fonte</label>
-                <select className="ae-select" id="ae-font-select" value={state.fontFamily} onChange={event => patchState({ fontFamily:event.target.value })}>
+                <select className="ae-select" id="ae-font-select" value={state.fontFamily} onChange={event => patchState({ fontFamily: event.target.value })}>
                   <option value="default">Inter (padrão)</option>
                   <option value="opendyslexic">OpenDyslexic</option>
                   <option value="system">Sistema</option>
@@ -226,7 +226,7 @@ export default function Sandbox() {
 
             <section>
               <div className="ae-section-title"><span className="material-symbols-outlined">visibility</span>Visual e foco</div>
-              <div className="ae-select-wrap" style={{ marginBottom:16 }}>
+              <div className="ae-select-wrap" style={{ marginBottom: 16 }}>
                 <label className="ae-label">Modo de contraste</label>
                 <div className="ae-segment">
                   {[
@@ -238,7 +238,7 @@ export default function Sandbox() {
                       className={`ae-segment-btn ${state.contrastMode === value ? 'active' : ''}`}
                       data-contrast={value}
                       aria-pressed={state.contrastMode === value}
-                      onClick={() => patchState({ contrastMode:value })}
+                      onClick={() => patchState({ contrastMode: value })}
                       type="button"
                       key={value}
                     >
@@ -280,12 +280,12 @@ export default function Sandbox() {
                 <span className="material-symbols-outlined">public</span>
                 <input className="ae-url-input" value={input} onChange={event => setInput(event.target.value)} type="text" placeholder="Cole uma URL, por exemplo https://example.com" aria-label="Página para renderizar" />
               </div>
-              <button className="ae-demo-btn" type="button" onClick={() => { setInput(''); setRenderTarget({ mode:'demo', url:'', srcDoc:'' }) }}>Exemplo</button>
+              <button className="ae-demo-btn" type="button" onClick={() => { setInput(''); setRenderTarget({ mode: 'demo', url: '', srcDoc: '' }) }}>Exemplo</button>
               <button className="ae-go-btn" type="submit">Renderizar</button>
             </form>
 
             <div className={`ae-viewport contrast-${state.contrastMode}`} ref={viewportRef} onScroll={onViewportScroll}>
-              {state.readingProgress && renderTarget.mode === 'demo' && <div className="ae-reading-progress" style={{ display:'block', width:`${progress}%` }} />}
+              {state.readingProgress && renderTarget.mode === 'demo' && <div className="ae-reading-progress" style={{ display: 'block', width: `${progress}%` }} />}
               <div className="ae-render-shell">
                 {renderTarget.mode === 'demo' ? (
                   <DemoArticle state={state} />
@@ -301,7 +301,7 @@ export default function Sandbox() {
                       referrerPolicy="no-referrer-when-downgrade"
                       onLoad={() => {
                         setFrameReady(true)
-                        iframeRef.current?.contentWindow?.postMessage({ type:'ACCESSFLOW_APPLY_STATE', state }, '*')
+                        iframeRef.current?.contentWindow?.postMessage({ type: 'ACCESSFLOW_APPLY_STATE', state }, '*')
                       }}
                     />
                     <div className="ae-frame-note">
@@ -390,7 +390,7 @@ function DemoArticle({ state }) {
         <span>8 min de leitura</span><span>·</span><span>Atualizado em 2026</span>
       </div>
       <div className="ae-img">
-        <span className="material-symbols-outlined" style={{ fontSize:32, color:'#9951e6' }}>image</span>
+        <span className="material-symbols-outlined" style={{ fontSize: 32, color: '#9951e6' }}>image</span>
         Imagem - texto alternativo gerado por IA
       </div>
       <p style={textStyle}>Pesquisas mostram que acessibilidade tipográfica, com espaçamento maior entre letras, altura de linha generosa e fontes escolhidas com cuidado, pode reduzir a carga cognitiva de leitores com dislexia e TDAH. Visite nossa <a href="#">biblioteca de pesquisa</a> para ver a metodologia completa.</p>
@@ -407,6 +407,12 @@ function DemoArticle({ state }) {
         {'}'}
       </div>
       <p style={textStyle}>O resultado é um ambiente de leitura que se adapta à pessoa, em vez de exigir que a pessoa se adapte à página. Experimente os controles à esquerda e veja a diferença em tempo real.</p>
+      <h2 style={textStyle}>Impacto na retenção de informação</h2>
+      <p style={textStyle}>Estudos conduzidos pela <a href="#">Universidade de Michigan</a> demonstram que leitores com dislexia retêm até 40% mais informação quando o texto é apresentado com fontes projetadas para legibilidade, como a <a href="#">OpenDyslexic</a>. As letras com bases mais pesadas criam uma âncora visual que reduz a rotação percebida dos caracteres.</p>
+      <p style={textStyle}>Além disso, a combinação de espaçamento generoso com alturas de linha acima de 1.8 reduz significativamente a fadiga ocular durante sessões prolongadas de leitura. Esse efeito é particularmente pronunciado em ambientes digitais, onde a luminosidade da tela adiciona uma camada extra de estresse visual.</p>
+      <h2 style={textStyle}>Acessibilidade como padrão de design</h2>
+      <p style={textStyle}>A tendência moderna de <a href="#">design inclusivo</a> propõe que acessibilidade não deveria ser uma adaptação posterior, mas um princípio fundamental desde a concepção do projeto. Quando um site é projetado considerando as necessidades de leitores neurodivergentes desde o início, todos os usuários se beneficiam de uma experiência mais clara e menos cognitivamente exigente.</p>
+      <p style={textStyle}>Ferramentas como o AccessFlow permitem que desenvolvedores e designers testem diferentes configurações de acessibilidade em tempo real, acelerando o ciclo de feedback e garantindo que os ajustes atendam às necessidades reais dos usuários. Consulte nossa <a href="#">documentação técnica</a> para integrar esses recursos ao seu projeto.</p>
     </article>
   )
 }
