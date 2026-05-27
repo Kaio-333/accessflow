@@ -297,7 +297,7 @@ export default function Sandbox() {
                       title={renderTarget.mode === 'external' ? `Página renderizada: ${renderTarget.url}` : 'HTML informado'}
                       src={iframeSrc}
                       srcDoc={renderTarget.mode === 'html' ? renderTarget.srcDoc : undefined}
-                      sandbox="allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox"
+                      sandbox="allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-same-origin"
                       referrerPolicy="no-referrer-when-downgrade"
                       onLoad={() => {
                         setFrameReady(true)
