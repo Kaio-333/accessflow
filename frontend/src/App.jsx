@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import Sidebar from './components/layout/Sidebar.tsx'
 import Landing from './pages/Landing.jsx'
 import Login from './pages/Login.jsx'
+import Register from './pages/Register.jsx'
 import Sandbox from './pages/Sandbox.jsx'
 import Changelog from './pages/Changelog.jsx'
 import DifficultyProfile from './pages/DifficultyProfile.jsx'
@@ -126,7 +127,8 @@ export default function App() {
 
       <main id="main-content" className="main-content" role="main">
         {view === 'landing' && <Landing onNavigate={navigate} />}
-        {view === 'login' && <Login onLogin={handleLogin} />}
+        {view === 'login' && <Login onLogin={handleLogin} onNavigate={navigate} />}
+        {view === 'register' && <Register onLogin={handleLogin} onNavigate={navigate} />}
         {view === 'sandbox' && <Sandbox />}
         {view === 'changelog' && <Changelog />}
         {view === 'difficulty-profile' && <DifficultyProfile />}

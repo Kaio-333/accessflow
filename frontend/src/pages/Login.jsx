@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-export default function Login({ onLogin }) {
+export default function Login({ onLogin, onNavigate }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -92,7 +92,7 @@ export default function Login({ onLogin }) {
           Continuar com Google
         </button>
 
-        <p className="login-footer">Ainda não tem conta? <a href="#">Criar conta</a></p>
+        <p className="login-footer">Ainda não tem conta? <a href="#register" onClick={(e) => { e.preventDefault(); onNavigate('register') }}>Criar conta</a></p>
         <a href="#" className="login-session-link">Usar sem conta em uma sessão temporária →</a>
       </div>
     </div>

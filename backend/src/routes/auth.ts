@@ -20,7 +20,7 @@ function signToken(userId: number, email: string): string {
 
 // POST /auth/register
 router.post("/register", async (req: Request, res: Response) => {
-    const { email, password, name } = req.body
+    const { email, password, name, contrast, font, animations, feedback } = req.body
 
     if (!email || !password || !name) {
         res.status(400).json({ error: "email, password e name são obrigatórios" })
@@ -28,7 +28,15 @@ router.post("/register", async (req: Request, res: Response) => {
     }
 
     try {
-        const user = await createUser(email, password, name)
+        const user = await createUser(
+            email,
+            password,
+            name,
+            contrast !== undefined ? Number(contrast) : undefined,
+            font !== undefined ? Number(font) : undefined,
+            animations !== undefined ? Boolean(animations) : undefined,
+            feedback
+        )
         const token = signToken(user.id, user.email)
         res.status(201).json({ token })
     } catch (err: any) {
