@@ -1,112 +1,110 @@
-# 💜 Swim
+# AccessFlow
 
-<div align="center">
-
-<img src="https://img.shields.io/badge/React-7C3AED?style=for-the-badge&logo=react&logoColor=white"/>
-<img src="https://img.shields.io/badge/Vite-8B5CF6?style=for-the-badge&logo=vite&logoColor=white"/>
-<img src="https://img.shields.io/badge/Node.js-A855F7?style=for-the-badge&logo=node.js&logoColor=white"/>
-
-<br/>
-
-###  Uma experiência moderna de acessibilidade para a web
-
-</div>
+Uma plataforma de acessibilidade para a web — carregue sites externos, aplique recursos de acessibilidade em tempo real e simule o funcionamento de uma extensão de navegador.
 
 ---
 
-#  Sobre o projeto
+## Tecnologias
 
-O **Swim** é uma plataforma desenvolvida para demonstrar recursos de acessibilidade em páginas web de forma simples, visual e interativa.
-
-A aplicação permite carregar sites externos dentro de um sandbox e aplicar funcionalidades de acessibilidade em tempo real, simulando o funcionamento de uma extensão moderna de navegador.
-
----
-
-#  Tecnologias
-
-* ⚛️ React
-* ⚡ Vite
-* 🟣 Node.js
+- React + Vite (frontend)
+- Node.js + Express + TypeScript (backend)
+- PostgreSQL via Docker
 
 ---
 
-#  Início rápido
+## Como rodar o projeto
+
+### Pré-requisitos
+
+- Node.js instalado
+- Docker instalado
+
+---
+
+### 1. Banco de dados (Docker)
+
+Entre na pasta do backend e suba o banco:
 
 ```bash
+cd backend
+docker compose up -d
+```
+
+Isso cria um container PostgreSQL na porta `5432` com o banco `accessflow`.
+
+---
+
+### 2. Configurar o `.env` do backend
+
+Copie o arquivo de exemplo e preencha:
+
+```bash
+cp backend/.env.example backend/.env
+```
+
+Conteúdo do `backend/.env`:
+
+```env
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/accessflow"
+JWT_SECRET=sua_chave_secreta_aqui
+```
+
+> O `DATABASE_URL` já está configurado para o Docker acima. Só mude se usar outro banco.
+
+---
+
+### 3. Rodar o backend
+
+```bash
+cd backend
 npm install
 npm run dev
 ```
 
-###  Ambientes
+O backend sobe em `http://localhost:8000`.
 
-```txt
-Front-end: http://127.0.0.1:5173
-Proxy:      http://127.0.0.1:5174
+**Atenção — CORS:** o backend só aceita requisições de `http://localhost:5173` (endereço padrão do Vite). Se o frontend rodar em outra porta, ajuste a linha abaixo em `backend/src/server.ts`:
+
+```ts
+app.use(cors({ origin: "http://localhost:5173" }))
 ```
 
 ---
 
-#  Estrutura do projeto
+### 4. Configurar o `.env` do frontend
 
-```txt
-src/
- ├── 📁 components/
- ├── 📁 views/
- ├── 📁 styles/
- ├── 📁 lib/
- └── 📁 data/
+Na raiz do projeto, copie o exemplo:
 
-server/
- ├── ⚙️ dev.js
- └── 🌐 proxy-server.js
+```bash
+cp .env.example frontend/.env
+```
+
+Conteúdo do `frontend/.env`:
+
+```env
+VITE_API_URL=http://localhost:8000
+VITE_APP_NAME=AccessFlow
+VITE_ENV=development
 ```
 
 ---
 
-#  Sandbox
+### 5. Rodar o frontend
 
-O sandbox permite:
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-*  Renderizar URLs externas
-*  Testar HTML personalizado
-*  Aplicar acessibilidade em tempo real
-*  Demonstrar funcionalidades visualmente
-
----
-
-#  Recursos de acessibilidade
-
-*  Alto contraste
-*  Escala de fonte
-*  Melhor legibilidade
-*  Navegação assistiva
-*  Interface adaptável
+O frontend sobe em `http://localhost:5173`.
 
 ---
 
-#  Diferenciais
+## Resumo dos endereços
 
-*  Renderização dinâmica de páginas reais
-*  Sistema de proxy próprio
-*  Interface moderna
-*  Estrutura organizada
-*  Demonstração prática de acessibilidade
-
----
-
-#  Futuras melhorias
-
-*  Leitor de voz
-*  IA para acessibilidade
-*  Extensão de navegador
-*  Auditoria automática WCAG
-
----
-
-<div align="center">
-
-# 💜 Swim
-
-### Tornando a web mais navegável para todos.
-
-</div>
+| Serviço    | Endereço                    |
+|------------|-----------------------------|
+| Frontend   | http://localhost:5173        |
+| Backend    | http://localhost:8000        |
+| PostgreSQL | localhost:5432               |
