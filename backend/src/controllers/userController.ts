@@ -19,7 +19,15 @@ export async function getUserById(id: number) {
 }
 
 // CREATE
-export async function createUser(email: string, password: string, name: string) {
+export async function createUser(
+    email: string, 
+    password: string, 
+    name: string,
+    contrast?: number,
+    font?: number,
+    animations?: boolean,
+    feedback?: string
+) {
     const senhaHash = await bcrypt.hash(password, 10)
     const user = await prisma.users.create({
         data: {
@@ -28,10 +36,10 @@ export async function createUser(email: string, password: string, name: string) 
             profile: {
                 create: {
                     name,
-                    contrast: 1,
-                    font: 1,
-                    animations: true,
-                    feedback: "",
+                    contrast: contrast !== undefined ? contrast : 1,
+                    font: font !== undefined ? font : 1,
+                    animations: animations !== undefined ? animations : true,
+                    feedback: feedback !== undefined ? feedback : "",
                 },
             },
         },

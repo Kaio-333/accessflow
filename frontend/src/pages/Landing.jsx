@@ -27,11 +27,11 @@ export default function Landing({ onNavigate }) {
           <h1 className="lp-hero-headline">A web, adaptada ao<br />jeito como sua mente lê.</h1>
           <p className="lp-hero-subline">Criado por HuGO para acompanhar você</p>
           <p className="lp-hero-body">
-            O AccessFlow ajusta qualquer página em tempo real para pessoas com dislexia e TDAH:
+            O Swim ajusta qualquer página em tempo real para pessoas com dislexia e TDAH:
             menos ruído, mais clareza e leitura no seu ritmo.
           </p>
           <div className="lp-hero-ctas">
-            <button className="lp-btn-primary" aria-label="Adicionar o AccessFlow ao Chrome gratuitamente">
+            <button className="lp-btn-primary" aria-label="Adicionar o Swim ao Chrome gratuitamente">
               <span className="material-symbols-outlined">download</span>
               Adicionar ao Chrome
             </button>
@@ -45,7 +45,7 @@ export default function Landing({ onNavigate }) {
 
       <section id="features" className="lp-features">
         <div className="lp-section-header">
-          <p className="lp-section-label">O que o AccessFlow faz</p>
+          <p className="lp-section-label">O que o Swim faz</p>
           <h2 className="lp-section-title" id="features-heading">20 recursos. Uma missão.</h2>
           <p className="lp-section-sub">
             Cada ajuste foi pensado para reduzir atrito cognitivo e tornar a web mais inclusiva.
@@ -73,7 +73,7 @@ export default function Landing({ onNavigate }) {
 
 function HowItWorks() {
   const steps = [
-    { n:'01', icon:'download', t:'Instale', d:'Adicione o AccessFlow ao Chrome em um clique, sem configuração inicial.' },
+    { n:'01', icon:'download', t:'Instale', d:'Adicione o Swim ao Chrome em um clique, sem configuração inicial.' },
     { n:'02', icon:'tune', t:'Configure', d:'Escolha seu perfil de leitura ou ajuste tudo manualmente no sandbox.' },
     { n:'03', icon:'public', t:'Navegue', d:'As páginas visitadas recebem os ajustes de acessibilidade automaticamente.' },
   ]
@@ -84,7 +84,7 @@ function HowItWorks() {
         <div className="lp-section-header">
           <p className="lp-section-label">Como funciona</p>
           <h2 className="lp-section-title">Três passos para ler com clareza.</h2>
-          <p className="lp-section-sub">O AccessFlow foi pensado para ficar em segundo plano: você navega, ele adapta.</p>
+          <p className="lp-section-sub">O Swim foi pensado para ficar em segundo plano: você navega, ele adapta.</p>
         </div>
         <div className="lp-steps">
           {steps.map(step => (
@@ -108,20 +108,20 @@ function Footer() {
         <div>
           <div className="lp-footer-logo">
             <div className="lp-footer-logo-icon"><span className="material-symbols-outlined">accessibility_new</span></div>
-            <span className="lp-footer-logo-name">AccessFlow</span>
+            <span className="lp-footer-logo-name">Swim</span>
           </div>
           <p className="lp-footer-tagline">A web, adaptada ao jeito como sua mente lê.</p>
           <p className="lp-footer-love">Feito com <span>♥</span> para mentes neurodivergentes.</p>
         </div>
         <div className="lp-footer-links">
           <a href="#" className="lp-footer-link">Política de privacidade</a>
-          <a href="https://github.com" target="_blank" rel="noopener" className="lp-footer-link">GitHub</a>
+          <a href="https://github.com/Kaio-333/accessflow" target="_blank" rel="noopener" className="lp-footer-link">GitHub</a>
           <a href="mailto:hello@accessflow.app" className="lp-footer-link">Contato</a>
         </div>
       </div>
       <div className="lp-footer-divider" />
       <div className="lp-footer-bottom">
-        <span>© {new Date().getFullYear()} AccessFlow. Todos os direitos reservados.</span>
+        <span>© {new Date().getFullYear()} Swim. Todos os direitos reservados.</span>
         <span>Construído com foco em conformidade WCAG AA.</span>
       </div>
     </footer>

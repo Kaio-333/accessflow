@@ -67,6 +67,309 @@
 .login-session-link:hover{color:#988d9f;}
 
 /* ============================================================
+   Register & Preset Styling
+   ============================================================ */
+.register-view {
+  min-height: 100vh;
+  position: relative;
+}
+.register-card {
+  max-width: 480px;
+  backdrop-filter: blur(16px);
+  background: rgba(31, 26, 35, 0.95);
+  border: 1px solid rgba(153, 81, 230, 0.2);
+  transition: all 0.3s ease;
+}
+.register-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(153, 81, 230, 0.12) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(40px);
+}
+
+/* Step indicator */
+.register-steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 28px;
+  max-width: 320px;
+  position: relative;
+}
+.step-dot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+  cursor: default;
+}
+.step-dot span {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #2e2832;
+  border: 2px solid #4c4453;
+  color: #988d9f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.step-dot label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #988d9f;
+  margin-top: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: color 0.3s;
+}
+.step-dot.active span {
+  background: #9951e6;
+  border-color: #9951e6;
+  color: #fff;
+  box-shadow: 0 0 12px rgba(153, 81, 230, 0.5);
+}
+.step-dot.active label {
+  color: #eadfed;
+}
+.step-connector {
+  flex: 1;
+  height: 2px;
+  background: #4c4453;
+  margin: -16px 12px 0;
+  position: relative;
+  z-index: 1;
+  transition: background 0.3s;
+}
+.step-connector.active {
+  background: #9951e6;
+}
+
+/* Form layout steps */
+.register-form-step {
+  animation: fadeIn 0.35s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Error Banner */
+.register-error-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 78, 103, 0.1);
+  border: 1px solid rgba(255, 78, 103, 0.25);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 20px;
+  color: #ffb4ab;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+/* JSON Actions Bar */
+.register-json-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.btn-json-action {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #231e27;
+  border: 1px solid #4c4453;
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: #cec2d5;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: 'Inter', sans-serif;
+  user-select: none;
+}
+.btn-json-action:hover {
+  background: rgba(153, 81, 230, 0.1);
+  border-color: #9951e6;
+  color: #dbb8ff;
+  box-shadow: 0 0 10px rgba(153, 81, 230, 0.15);
+}
+.btn-json-action:active {
+  transform: scale(0.98);
+}
+
+/* Premium Live Preview Box */
+.register-preview-box {
+  border-radius: 14px;
+  border: 1px solid #4c4453;
+  padding: 16px;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+}
+.preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.preview-badge {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 2px 8px;
+  border-radius: 99px;
+}
+.preview-spinner {
+  animation: spin 3s linear infinite;
+  color: #9951e6;
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.preview-title {
+  font-size: 1.15em;
+  margin: 6px 0 2px 0;
+  color: inherit;
+}
+.preview-text {
+  font-size: 1em !important;
+  line-height: 1.5;
+  color: inherit;
+}
+.preview-pulse-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #9951e6, #dbb8ff);
+  width: 100%;
+  animation: pulseBar 2.5s ease-in-out infinite;
+}
+@keyframes pulseBar {
+  0% { opacity: 0.3; transform: scaleX(0.7); }
+  50% { opacity: 0.95; transform: scaleX(1); }
+  100% { opacity: 0.3; transform: scaleX(0.7); }
+}
+
+/* Contrast interactive grid */
+.register-fieldset {
+  margin-bottom: 22px;
+  border: 1px solid rgba(76, 68, 83, 0.4);
+}
+.contrast-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 10px;
+}
+.contrast-card-btn {
+  background: #231e27;
+  border: 1px solid #4c4453;
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.contrast-card-btn:hover {
+  background: #2e2832;
+  border-color: #988d9f;
+}
+.contrast-card-btn.active {
+  border-color: #9951e6;
+  background: rgba(153, 81, 230, 0.08);
+  box-shadow: 0 0 10px rgba(153, 81, 230, 0.15);
+}
+.contrast-card-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #eadfed;
+  margin-bottom: 4px;
+}
+.contrast-card-desc {
+  font-size: 10px;
+  color: #988d9f;
+  line-height: 1.3;
+}
+.contrast-card-btn.active .contrast-card-label {
+  color: #dbb8ff;
+}
+
+/* Action Buttons */
+.btn-register-next {
+  margin-top: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.register-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 28px;
+}
+.btn-register-back {
+  background: transparent;
+  border: 1px solid #4c4453;
+  color: #cec2d5;
+  border-radius: 8px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-register-back:hover {
+  background: #231e27;
+  border-color: #988d9f;
+  color: #eadfed;
+}
+.btn-register-submit {
+  flex: 1;
+  margin-top: 0 !important;
+}
+
+@media (max-width: 480px) {
+  .contrast-grid {
+    grid-template-columns: 1fr;
+  }
+  .register-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+  .btn-register-back {
+    justify-content: center;
+  }
+}
+
+
+/* ============================================================
    Sandbox View — Aether
    ============================================================ */
 .ae-sandbox-view{display:flex;flex-direction:column;height:100vh;overflow:hidden;background:#16111b;font-family:'Inter',system-ui,sans-serif;color:#eadfed;}
