@@ -1,6 +1,35 @@
-import React from 'react'
+import React, { useState } from 'react'
 
-export default function Login() {
+export default function Login({ onLogin }) {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  async function handleSubmit(e) {
+    e.preventDefault()
+    setError('')
+    setLoading(true)
+    try {
+      const res = await fetch('http://localhost:8000/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setError(data.error || 'Erro ao entrar')
+        return
+      }
+      localStorage.setItem('token', data.token)
+      onLogin(email)
+    } catch {
+      setError('Não foi possível conectar ao servidor')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <div className="login-view">
       <div className="login-card">
@@ -11,21 +40,45 @@ export default function Login() {
         <h1 className="login-title">Bem-vindo de volta</h1>
         <p className="login-subtitle">Entre para sincronizar suas configurações de acessibilidade entre dispositivos.</p>
 
-        <div className="form-group">
-          <label className="form-label" htmlFor="login-email">E-mail</label>
-          <input className="form-input" type="email" id="login-email" placeholder="voce@exemplo.com" autoComplete="email" />
-        </div>
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label className="form-label" htmlFor="login-email">E-mail</label>
+            <input
+              className="form-input"
+              type="email"
+              id="login-email"
+              placeholder="voce@exemplo.com"
+              autoComplete="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              required
+            />
+          </div>
 
-        <div className="form-group">
-          <label className="form-label" htmlFor="login-password">Senha</label>
-          <input className="form-input" type="password" id="login-password" placeholder="••••••••••" autoComplete="current-password" />
-          <div className="login-forgot"><a href="#">Esqueceu a senha?</a></div>
-        </div>
+          <div className="form-group">
+            <label className="form-label" htmlFor="login-password">Senha</label>
+            <input
+              className="form-input"
+              type="password"
+              id="login-password"
+              placeholder="••••••••••"
+              autoComplete="current-password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              required
+            />
+            <div className="login-forgot"><a href="#">Esqueceu a senha?</a></div>
+          </div>
 
-        <button className="btn-login">
-          <span className="material-symbols-outlined" style={{ fontSize:18, fontVariationSettings:"'FILL' 1" }}>login</span>
-          Entrar
-        </button>
+          {error && (
+            <p style={{ color: 'red', fontSize: '0.875rem', marginBottom: '0.75rem' }}>{error}</p>
+          )}
+
+          <button className="btn-login" type="submit" disabled={loading}>
+            <span className="material-symbols-outlined" style={{ fontSize: 18, fontVariationSettings: "'FILL' 1" }}>login</span>
+            {loading ? 'Entrando…' : 'Entrar'}
+          </button>
+        </form>
 
         <div className="login-divider"><span>ou</span></div>
 
