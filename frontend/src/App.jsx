@@ -11,6 +11,19 @@ export default function App() {
   const [section, setSection] = useState(null)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [user, setUser] = useState(localStorage.getItem('userEmail') || null)
+
+  function handleLogin(email) {
+    localStorage.setItem('userEmail', email)
+    setUser(email)
+    navigate('landing')
+  }
+
+  function handleLogout() {
+    localStorage.removeItem('token')
+    localStorage.removeItem('userEmail')
+    setUser(null)
+  }
 
   useEffect(() => {
     function closeOnEscape(event) {
@@ -51,7 +64,17 @@ export default function App() {
   return (
     <>
       {/* Global login button — top-right on all pages */}
-      {view !== 'login' && (
+      {user ? (
+        <button
+          id="global-login-btn"
+          className="global-login-btn"
+          aria-label="Sair da conta"
+          onClick={handleLogout}
+        >
+          <span className="material-symbols-outlined">account_circle</span>
+          <span className="global-login-label">Sair</span>
+        </button>
+      ) : view !== 'login' && (
         <button
           id="global-login-btn"
           className="global-login-btn"
@@ -103,7 +126,7 @@ export default function App() {
 
       <main id="main-content" className="main-content" role="main">
         {view === 'landing' && <Landing onNavigate={navigate} />}
-        {view === 'login' && <Login />}
+        {view === 'login' && <Login onLogin={handleLogin} />}
         {view === 'sandbox' && <Sandbox />}
         {view === 'changelog' && <Changelog />}
         {view === 'difficulty-profile' && <DifficultyProfile />}
