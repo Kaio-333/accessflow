@@ -244,3 +244,39 @@
   .lp-footer-links { flex-direction: column; gap: 12px; }
   .lp-footer-bottom { flex-direction: column; gap: 8px; }
 }
+
+/* Pricing */
+.lp-pricing { padding: 100px 48px; max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
+.lp-price-card {
+  max-width: 420px; margin: 0 auto; position: relative;
+  background: linear-gradient(180deg, #251d2b 0%, #1d1722 100%);
+  border: 1px solid #4c4453; border-radius: 24px; padding: 40px 32px;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.45); text-align: center;
+}
+.lp-price-card::before {
+  content: ''; position: absolute; inset: 0; border-radius: 24px; padding: 1px;
+  background: linear-gradient(180deg, rgba(153,81,230,0.6), rgba(153,81,230,0));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none;
+}
+.lp-price-badge {
+  display: inline-block; padding: 5px 14px; border-radius: 9999px; margin-bottom: 20px;
+  background: rgba(153,81,230,0.16); color: #dbb8ff;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.1em;
+}
+.lp-price-name { font-size: 20px; font-weight: 600; color: #eadfed; margin-bottom: 12px; }
+.lp-price-value { display: flex; align-items: baseline; justify-content: center; gap: 4px; margin-bottom: 28px; }
+.lp-price-currency { font-size: 24px; font-weight: 600; color: #cec2d5; }
+.lp-price-amount { font-size: 56px; font-weight: 800; color: #fff; line-height: 1; letter-spacing: -0.02em; }
+.lp-price-period { font-size: 16px; color: #988d9f; }
+.lp-price-perks { list-style: none; margin: 0 0 28px; padding: 0; display: flex; flex-direction: column; gap: 12px; text-align: left; }
+.lp-price-perks li { display: flex; align-items: center; gap: 10px; font-size: 14px; color: #cec2d5; }
+.lp-price-perks .material-symbols-outlined { font-size: 20px; color: #9951e6; flex-shrink: 0; }
+.lp-price-cta { width: 100%; justify-content: center; }
+.lp-price-note { margin-top: 16px; font-size: 12px; color: #988d9f; font-family: 'JetBrains Mono', monospace; }
+
+@media (max-width: 768px) {
+  .lp-pricing { padding: 64px 24px; }
+  .lp-price-card { padding: 32px 24px; }
+}

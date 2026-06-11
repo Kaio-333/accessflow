@@ -66,8 +66,52 @@ export default function Landing({ onNavigate }) {
 
       <BeforeAfter />
       <HowItWorks />
+      <Pricing onNavigate={onNavigate} />
       <Footer />
     </div>
+  )
+}
+
+function Pricing({ onNavigate }) {
+  const perks = [
+    'Ajustes de acessibilidade em qualquer site',
+    'Perfis personalizados salvos na nuvem',
+    'Sandbox completo com pré-visualização ao vivo',
+    'Régua de leitura, foco e remoção de animações',
+    'Suporte prioritário',
+  ]
+
+  return (
+    <section id="pricing" className="lp-pricing">
+      <div className="lp-section-header">
+        <p className="lp-section-label">Planos</p>
+        <h2 className="lp-section-title">Acesso completo ao Swim.</h2>
+        <p className="lp-section-sub">Um plano simples, sem pegadinhas. Cancele quando quiser.</p>
+      </div>
+
+      <div className="lp-price-card">
+        <div className="lp-price-badge">Mais popular</div>
+        <h3 className="lp-price-name">Acesso completo</h3>
+        <div className="lp-price-value">
+          <span className="lp-price-currency">R$</span>
+          <span className="lp-price-amount">9,99</span>
+          <span className="lp-price-period">/mês</span>
+        </div>
+        <ul className="lp-price-perks" role="list">
+          {perks.map(perk => (
+            <li key={perk}>
+              <span className="material-symbols-outlined" aria-hidden="true">check_circle</span>
+              {perk}
+            </li>
+          ))}
+        </ul>
+        <button className="lp-btn-primary lp-price-cta" onClick={() => onNavigate('register')}>
+          <span className="material-symbols-outlined">lock_open</span>
+          Obter acesso
+        </button>
+        <p className="lp-price-note">Pagamento mensal · sem fidelidade</p>
+      </div>
+    </section>
   )
 }
 
@@ -103,7 +147,7 @@ function HowItWorks() {
 
 function Footer() {
   return (
-    <footer id="pricing" className="lp-footer">
+    <footer id="site-footer" className="lp-footer">
       <div className="lp-footer-inner">
         <div>
           <div className="lp-footer-logo">

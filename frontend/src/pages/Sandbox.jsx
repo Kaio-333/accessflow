@@ -4,11 +4,14 @@ import {
   ACCESSFLOW_PRESETS,
   ACTIVE_PROFILE_KEY,
   DEFAULT_ACCESSFLOW_STATE,
+  accessflowStateToProfile,
   compactUrl,
   looksLikeHTML,
   normalizePageUrl,
   readActiveProfile,
 } from '../lib/accessflowConfig.js'
+
+const API_URL = 'http://localhost:8000'
 
 const FONT_MAP = {
   default: "'Inter', system-ui, sans-serif",
@@ -31,10 +34,15 @@ export default function Sandbox() {
   const [isDragging, setIsDragging] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [showHelp, setShowHelp] = useState(false)
+  const [saveName, setSaveName] = useState('')
+  const [showSave, setShowSave] = useState(false)
+  const [saveStatus, setSaveStatus] = useState('idle') // idle | saving | ok | error | unauth
+  const [importStatus, setImportStatus] = useState('idle') // idle | ok | error
   const iframeRef = useRef(null)
   const viewportRef = useRef(null)
   const dragRef = useRef(null)
   const previewCardRef = useRef(null)
+  const importInputRef = useRef(null)
 
   // Fullscreen on the preview card
   useEffect(() => {
@@ -204,6 +212,70 @@ export default function Sandbox() {
     URL.revokeObjectURL(anchor.href)
   }
 
+  function importJSON(event) {
+    const file = event.target.files?.[0]
+    event.target.value = ''
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = e => {
+      try {
+        const parsed = JSON.parse(e.target.result)
+        const t = parsed.typography || {}
+        const v = parsed.visual || {}
+        const r = parsed.reading || {}
+        const clamp = (n, min, max, fallback) => {
+          const num = Number(n)
+          return Number.isFinite(num) ? Math.min(max, Math.max(min, num)) : fallback
+        }
+        setState(current => ({
+          ...DEFAULT_ACCESSFLOW_STATE,
+          preset: parsed.preset && ACCESSFLOW_PRESETS[parsed.preset] ? parsed.preset : 'none',
+          fontFamily: ['default', 'opendyslexic', 'system'].includes(t.fontFamily) ? t.fontFamily : current.fontFamily,
+          fontSize: clamp(t.fontSize, 12, 24, current.fontSize),
+          letterSpacing: clamp(t.letterSpacing, 0, 6, current.letterSpacing),
+          lineHeight: clamp(t.lineHeight, 1.2, 2.5, current.lineHeight),
+          contrastMode: ['normal', 'high', 'dark'].includes(v.contrastMode) ? v.contrastMode : 'normal',
+          focusMode: !!v.focusMode,
+          highlightLinks: !!v.highlightLinks,
+          removeAnimations: !!v.removeAnimations,
+          readingRuler: !!r.readingRuler,
+          readingProgress: !!r.readingProgress,
+        }))
+        setImportStatus('ok')
+      } catch {
+        setImportStatus('error')
+      }
+      window.setTimeout(() => setImportStatus('idle'), 3000)
+    }
+    reader.readAsText(file)
+  }
+
+  async function saveProfile() {
+    const name = saveName.trim()
+    if (!name) return
+    const token = localStorage.getItem('token')
+    if (!token) {
+      setSaveStatus('unauth')
+      return
+    }
+    setSaveStatus('saving')
+    try {
+      const res = await fetch(`${API_URL}/profiles`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify(accessflowStateToProfile(state, name)),
+      })
+      if (res.status === 401) { setSaveStatus('unauth'); return }
+      if (!res.ok) { setSaveStatus('error'); return }
+      setSaveStatus('ok')
+      setSaveName('')
+      setShowSave(false)
+      window.setTimeout(() => setSaveStatus('idle'), 3000)
+    } catch {
+      setSaveStatus('error')
+    }
+  }
+
   function onViewportScroll() {
     const viewport = viewportRef.current
     if (!viewport || !state.readingProgress || renderTarget.mode !== 'demo') return
@@ -213,7 +285,7 @@ export default function Sandbox() {
 
   return (
     <div className="ae-sandbox-view" onMouseMove={event => setMouseY(event.clientY - 18)}>
-      {state.readingRuler && <div className="ae-reading-ruler" aria-hidden="true" style={{ display: 'block', top: mouseY }} />}
+      {state.readingRuler && renderTarget.mode === 'demo' && <div className="ae-reading-ruler" aria-hidden="true" style={{ display: 'block', top: mouseY }} />}
 
       <header className="ae-topbar">
         <div className="ae-topbar-left">
@@ -234,18 +306,10 @@ export default function Sandbox() {
               <div className="ae-help-bubble" role="dialog" aria-label="Como usar o Sandbox" style={{ width: 280, right: 0, left: 'auto', transform: 'none' }}>
                 Use o painel à esquerda para simular necessidades de leitura. Cole uma URL ou HTML
                 para testar em páginas reais, ative um perfil em "Meus Perfis" ou use o botão de
-                tela cheia para ver o preview ampliado.
+                tela cheia (na barra de URL) para ver o preview ampliado.
               </div>
             )}
           </div>
-          <button
-            className="ae-icon-btn"
-            aria-label={isFullscreen ? 'Sair da tela cheia' : 'Tela cheia'}
-            aria-pressed={isFullscreen}
-            onClick={toggleFullscreen}
-          >
-            <span className="material-symbols-outlined">{isFullscreen ? 'fullscreen_exit' : 'fullscreen'}</span>
-          </button>
         </div>
       </header>
 
@@ -313,7 +377,41 @@ export default function Sandbox() {
           </div>
 
           <div className="ae-settings-footer">
-            <button className="ae-btn-export" onClick={exportJSON}><span className="material-symbols-outlined">data_object</span>Exportar JSON</button>
+            {showSave ? (
+              <div className="ae-save-profile">
+                <input
+                  className="ae-save-input"
+                  type="text"
+                  value={saveName}
+                  onChange={e => setSaveName(e.target.value)}
+                  placeholder="Nome do perfil"
+                  aria-label="Nome do novo perfil"
+                  onKeyDown={e => { if (e.key === 'Enter') saveProfile() }}
+                  autoFocus
+                />
+                <button className="ae-go-btn" type="button" disabled={!saveName.trim() || saveStatus === 'saving'} onClick={saveProfile}>
+                  {saveStatus === 'saving' ? 'Salvando…' : 'Salvar'}
+                </button>
+                <button className="ae-btn-reset" type="button" onClick={() => { setShowSave(false); setSaveStatus('idle') }}>Cancelar</button>
+              </div>
+            ) : (
+              <button className="ae-btn-export" onClick={() => { setShowSave(true); setSaveStatus('idle') }}>
+                <span className="material-symbols-outlined">bookmark_add</span>Salvar como perfil
+              </button>
+            )}
+
+            {saveStatus === 'ok' && <p className="ae-footer-msg ok">Perfil salvo! Veja em "Meus Perfis".</p>}
+            {saveStatus === 'error' && <p className="ae-footer-msg err">Não foi possível salvar o perfil.</p>}
+            {saveStatus === 'unauth' && <p className="ae-footer-msg err">Faça login para salvar perfis.</p>}
+
+            <div className="ae-footer-row">
+              <button className="ae-btn-export" onClick={exportJSON}><span className="material-symbols-outlined">data_object</span>Exportar JSON</button>
+              <button className="ae-btn-export" onClick={() => importInputRef.current?.click()}><span className="material-symbols-outlined">upload_file</span>Importar JSON</button>
+            </div>
+            <input ref={importInputRef} type="file" accept=".json,application/json" style={{ display: 'none' }} onChange={importJSON} />
+            {importStatus === 'ok' && <p className="ae-footer-msg ok">Configuração importada.</p>}
+            {importStatus === 'error' && <p className="ae-footer-msg err">Arquivo JSON inválido.</p>}
+
             <button className="ae-btn-reset" onClick={resetState}>Restaurar padrões</button>
           </div>
         </aside>
@@ -348,6 +446,16 @@ export default function Sandbox() {
               </div>
               <button className="ae-demo-btn" type="button" onClick={() => { setInput(''); setRenderTarget({ mode: 'demo', url: '', srcDoc: '' }) }}>Exemplo</button>
               <button className="ae-go-btn" type="submit">Renderizar</button>
+              <button
+                className="ae-fullscreen-btn"
+                type="button"
+                aria-label={isFullscreen ? 'Sair da tela cheia' : 'Renderizar em tela cheia'}
+                aria-pressed={isFullscreen}
+                title={isFullscreen ? 'Sair da tela cheia' : 'Tela cheia'}
+                onClick={toggleFullscreen}
+              >
+                <span className="material-symbols-outlined">{isFullscreen ? 'fullscreen_exit' : 'fullscreen'}</span>
+              </button>
             </form>
 
             <div className={`ae-viewport contrast-${state.contrastMode}`} ref={viewportRef} onScroll={onViewportScroll}>

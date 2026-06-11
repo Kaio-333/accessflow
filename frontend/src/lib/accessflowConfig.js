@@ -68,6 +68,25 @@ export function profileToAccessflowState(profile) {
   }
 }
 
+// Inverso de profileToAccessflowState: converte o estado do Sandbox no modelo
+// simples do backend (font 1-5, contrast 1-4, animations) para salvar um perfil.
+export function accessflowStateToProfile(state, name) {
+  let font = 3
+  let bestDiff = Infinity
+  for (const [level, size] of Object.entries(PROFILE_FONT_SIZES)) {
+    const diff = Math.abs((state?.fontSize ?? 16) - size)
+    if (diff < bestDiff) { bestDiff = diff; font = Number(level) }
+  }
+  const contrast = state?.contrastMode === 'high' ? 4 : state?.contrastMode === 'dark' ? 3 : 1
+  return {
+    name,
+    font,
+    contrast,
+    animations: !state?.removeAnimations,
+    feedback: '',
+  }
+}
+
 // Chave de localStorage usada para passar o perfil ativo da página "Meus Perfis"
 // para o preview do Sandbox.
 export const ACTIVE_PROFILE_KEY = 'accessflow:activeProfile'
