@@ -1,5 +1,14 @@
 import { prisma } from "../lib/prisma.js"
-import { Font, Contrast } from "@prisma/client"
+
+// LIST BY USER
+export async function getProfilesByUser(userId: number) {
+    const profiles = await prisma.profile.findMany({
+        where: { userId },
+        orderBy: { id: "asc" }
+    })
+
+    return profiles
+}
 
 // GET BY ID
 export async function getProfile(userId: number, id: number) {
@@ -7,9 +16,6 @@ export async function getProfile(userId: number, id: number) {
         where: {
             id,
             userId
-        },
-        include: {
-            user: true
         }
     })
 
@@ -20,34 +26,18 @@ export async function getProfile(userId: number, id: number) {
 export async function createProfile(
     userId: number,
     name: string,
-    font: Font,
-    size_font: number,
-    letter_spacing: number,
-    line_height: number,
-    contrast: Contrast,
-    focus_mode: boolean,
-    highlight_links: boolean,
+    contrast: number,
+    font: number,
     animations: boolean,
-    remove_animations: boolean,
-    reading_ruler: boolean,
-    reading_progress: boolean,
     feedback: string
 ) {
     const profile = await prisma.profile.create({
         data: {
             userId,
             name,
-            font,
-            size_font,
-            letter_spacing,
-            line_height,
             contrast,
-            focus_mode,
-            highlight_links,
+            font,
             animations,
-            remove_animations,
-            reading_ruler,
-            reading_progress,
             feedback
         }
     })
@@ -61,17 +51,9 @@ export async function updateProfile(
     id: number,
     data: {
         name?: string
-        font?: Font
-        size_font?: number
-        letter_spacing?: number
-        line_height?: number
-        contrast?: Contrast
-        focus_mode?: boolean
-        highlight_links?: boolean
+        contrast?: number
+        font?: number
         animations?: boolean
-        remove_animations?: boolean
-        reading_ruler?: boolean
-        reading_progress?: boolean
         feedback?: string
     }
 ) {

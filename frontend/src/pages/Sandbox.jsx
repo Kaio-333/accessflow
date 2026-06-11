@@ -2,10 +2,12 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { injectAccessflowBridge } from '../lib/accessflowBridge.js'
 import {
   ACCESSFLOW_PRESETS,
+  ACTIVE_PROFILE_KEY,
   DEFAULT_ACCESSFLOW_STATE,
   compactUrl,
   looksLikeHTML,
   normalizePageUrl,
+  readActiveProfile,
 } from '../lib/accessflowConfig.js'
 
 const FONT_MAP = {
@@ -15,7 +17,11 @@ const FONT_MAP = {
 }
 
 export default function Sandbox() {
-  const [state, setState] = useState(DEFAULT_ACCESSFLOW_STATE)
+  const [state, setState] = useState(() => {
+    const active = readActiveProfile()
+    return active ? { ...DEFAULT_ACCESSFLOW_STATE, ...active.state } : DEFAULT_ACCESSFLOW_STATE
+  })
+  const [appliedProfile, setAppliedProfile] = useState(() => readActiveProfile()?.name ?? null)
   const [input, setInput] = useState('')
   const [renderTarget, setRenderTarget] = useState({ mode: 'demo', url: '', srcDoc: '' })
   const [frameReady, setFrameReady] = useState(false)
@@ -23,9 +29,37 @@ export default function Sandbox() {
   const [progress, setProgress] = useState(0)
   const [settingsWidth, setSettingsWidth] = useState(320)
   const [isDragging, setIsDragging] = useState(false)
+  const [isFullscreen, setIsFullscreen] = useState(false)
+  const [showHelp, setShowHelp] = useState(false)
   const iframeRef = useRef(null)
   const viewportRef = useRef(null)
   const dragRef = useRef(null)
+  const previewCardRef = useRef(null)
+
+  // Fullscreen on the preview card
+  useEffect(() => {
+    function onFullscreenChange() {
+      setIsFullscreen(document.fullscreenElement === previewCardRef.current)
+    }
+    document.addEventListener('fullscreenchange', onFullscreenChange)
+    return () => document.removeEventListener('fullscreenchange', onFullscreenChange)
+  }, [])
+
+  function toggleFullscreen() {
+    const el = previewCardRef.current
+    if (!el) return
+    if (document.fullscreenElement) {
+      document.exitFullscreen()
+    } else {
+      el.requestFullscreen?.()
+    }
+  }
+
+  function clearActiveProfile() {
+    localStorage.removeItem(ACTIVE_PROFILE_KEY)
+    setAppliedProfile(null)
+    setState(DEFAULT_ACCESSFLOW_STATE)
+  }
 
   // Resizable settings panel
   useEffect(() => {
@@ -187,8 +221,31 @@ export default function Sandbox() {
           <div className="ae-live-badge"><span className="ae-live-dot" />Ambiente ao vivo</div>
         </div>
         <div className="ae-topbar-right">
-          <button className="ae-icon-btn" aria-label="Configurações"><span className="material-symbols-outlined">settings</span></button>
-          <button className="ae-icon-btn" aria-label="Conta"><span className="material-symbols-outlined">account_circle</span></button>
+          <div className="ae-help">
+            <button
+              className="ae-icon-btn"
+              aria-label="Ajuda"
+              aria-expanded={showHelp}
+              onClick={() => setShowHelp(open => !open)}
+            >
+              <span className="material-symbols-outlined">help</span>
+            </button>
+            {showHelp && (
+              <div className="ae-help-bubble" role="dialog" aria-label="Como usar o Sandbox" style={{ width: 280, right: 0, left: 'auto', transform: 'none' }}>
+                Use o painel à esquerda para simular necessidades de leitura. Cole uma URL ou HTML
+                para testar em páginas reais, ative um perfil em "Meus Perfis" ou use o botão de
+                tela cheia para ver o preview ampliado.
+              </div>
+            )}
+          </div>
+          <button
+            className="ae-icon-btn"
+            aria-label={isFullscreen ? 'Sair da tela cheia' : 'Tela cheia'}
+            aria-pressed={isFullscreen}
+            onClick={toggleFullscreen}
+          >
+            <span className="material-symbols-outlined">{isFullscreen ? 'fullscreen_exit' : 'fullscreen'}</span>
+          </button>
         </div>
       </header>
 
@@ -274,7 +331,16 @@ export default function Sandbox() {
         </div>
 
         <section className="ae-preview">
-          <div className="ae-preview-card">
+          <div className="ae-preview-card" ref={previewCardRef}>
+            {appliedProfile && (
+              <div className="ae-active-profile">
+                <div className="ae-active-profile-left">
+                  <span className="material-symbols-outlined">badge</span>
+                  <span>Perfil <strong>{appliedProfile}</strong> aplicado ao preview</span>
+                </div>
+                <button className="ae-active-profile-clear" onClick={clearActiveProfile}>Limpar</button>
+              </div>
+            )}
             <form className="ae-url-bar" onSubmit={handleSubmit}>
               <div className="ae-url-input-wrap">
                 <span className="material-symbols-outlined">public</span>
@@ -360,13 +426,37 @@ function Toggle({ icon, label, tip, checked, onChange }) {
       <div className="ae-toggle-label">
         <span className="material-symbols-outlined ae-toggle-icon">{icon}</span>
         <span>{label}</span>
-        <span className="material-symbols-outlined ae-info-icon" title={tip}>info</span>
+        <HelpTip text={tip} label={`Ajuda: ${label}`} />
       </div>
       <label className="ae-switch">
         <input type="checkbox" checked={checked} onChange={event => onChange(event.target.checked)} />
         <div className="ae-track" />
       </label>
     </div>
+  )
+}
+
+function HelpTip({ text, label }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <span
+      className="ae-help"
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+    >
+      <button
+        type="button"
+        className="ae-help-btn"
+        aria-label={label}
+        aria-expanded={open}
+        title={text}
+        onFocus={() => setOpen(true)}
+        onBlur={() => setOpen(false)}
+      >
+        <span className="material-symbols-outlined">help</span>
+      </button>
+      {open && <span className="ae-help-bubble" role="tooltip">{text}</span>}
+    </span>
   )
 }
 

@@ -51,6 +51,36 @@ export const ACCESSFLOW_PRESETS = {
   },
 }
 
+// Mapeia um perfil salvo (modelo simples do backend: contrast 1-4, font 1-5,
+// animations) para o estado de acessibilidade usado no preview do Sandbox.
+const PROFILE_FONT_SIZES = { 1: 12, 2: 14, 3: 16, 4: 18, 5: 22 }
+
+export function profileToAccessflowState(profile) {
+  const fontSize = PROFILE_FONT_SIZES[profile?.font] ?? DEFAULT_ACCESSFLOW_STATE.fontSize
+  const contrastMode = Number(profile?.contrast) >= 3 ? 'high' : 'normal'
+  const removeAnimations = !profile?.animations
+  return {
+    ...DEFAULT_ACCESSFLOW_STATE,
+    preset: 'none',
+    fontSize,
+    contrastMode,
+    removeAnimations,
+  }
+}
+
+// Chave de localStorage usada para passar o perfil ativo da página "Meus Perfis"
+// para o preview do Sandbox.
+export const ACTIVE_PROFILE_KEY = 'accessflow:activeProfile'
+
+export function readActiveProfile() {
+  try {
+    const raw = localStorage.getItem(ACTIVE_PROFILE_KEY)
+    return raw ? JSON.parse(raw) : null
+  } catch {
+    return null
+  }
+}
+
 export function normalizePageUrl(value) {
   const trimmed = value.trim()
   const withProtocol = /^[a-z][a-z0-9+.-]*:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`
