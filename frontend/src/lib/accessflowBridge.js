@@ -10,6 +10,21 @@ export function createAccessflowBridgeScript() {
         document.head.appendChild(style);
       }
 
+      // O iframe é um documento separado e não herda os @font-face do app.
+      // Sem isto, 'OpenDyslexic' não existe dentro do iframe e cai no fallback.
+      if (!document.getElementById('accessflow-font-face')) {
+        var fontStyle = document.createElement('style');
+        fontStyle.id = 'accessflow-font-face';
+        fontStyle.textContent =
+          "@font-face{font-family:'OpenDyslexic';font-style:normal;font-weight:400;font-display:swap;" +
+          "src:url('https://cdn.jsdelivr.net/fontsource/fonts/opendyslexic@latest/latin-400-normal.woff2') format('woff2')," +
+          "url('https://cdn.jsdelivr.net/fontsource/fonts/opendyslexic@latest/latin-400-normal.woff') format('woff');}" +
+          "@font-face{font-family:'OpenDyslexic';font-style:normal;font-weight:700;font-display:swap;" +
+          "src:url('https://cdn.jsdelivr.net/fontsource/fonts/opendyslexic@latest/latin-700-normal.woff2') format('woff2')," +
+          "url('https://cdn.jsdelivr.net/fontsource/fonts/opendyslexic@latest/latin-700-normal.woff') format('woff');}";
+        (document.head || document.documentElement).appendChild(fontStyle);
+      }
+
       function cssForState(state) {
         var fonts = {
           default: "'Inter', system-ui, sans-serif",
