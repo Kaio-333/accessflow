@@ -2,11 +2,16 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { injectAccessflowBridge } from '../lib/accessflowBridge.js'
 import {
   ACCESSFLOW_PRESETS,
+  ACTIVE_PROFILE_KEY,
   DEFAULT_ACCESSFLOW_STATE,
+  accessflowStateToProfile,
   compactUrl,
   looksLikeHTML,
   normalizePageUrl,
+  readActiveProfile,
 } from '../lib/accessflowConfig.js'
+
+const API_URL = 'http://localhost:8000'
 
 const FONT_MAP = {
   default: "'Inter', system-ui, sans-serif",
@@ -15,7 +20,11 @@ const FONT_MAP = {
 }
 
 export default function Sandbox() {
-  const [state, setState] = useState(DEFAULT_ACCESSFLOW_STATE)
+  const [state, setState] = useState(() => {
+    const active = readActiveProfile()
+    return active ? { ...DEFAULT_ACCESSFLOW_STATE, ...active.state } : DEFAULT_ACCESSFLOW_STATE
+  })
+  const [appliedProfile, setAppliedProfile] = useState(() => readActiveProfile()?.name ?? null)
   const [input, setInput] = useState('')
   const [renderTarget, setRenderTarget] = useState({ mode: 'demo', url: '', srcDoc: '' })
   const [frameReady, setFrameReady] = useState(false)
@@ -23,9 +32,42 @@ export default function Sandbox() {
   const [progress, setProgress] = useState(0)
   const [settingsWidth, setSettingsWidth] = useState(320)
   const [isDragging, setIsDragging] = useState(false)
+  const [isFullscreen, setIsFullscreen] = useState(false)
+  const [showHelp, setShowHelp] = useState(false)
+  const [saveName, setSaveName] = useState('')
+  const [showSave, setShowSave] = useState(false)
+  const [saveStatus, setSaveStatus] = useState('idle') // idle | saving | ok | error | unauth
+  const [importStatus, setImportStatus] = useState('idle') // idle | ok | error
   const iframeRef = useRef(null)
   const viewportRef = useRef(null)
   const dragRef = useRef(null)
+  const previewCardRef = useRef(null)
+  const importInputRef = useRef(null)
+
+  // Fullscreen on the preview card
+  useEffect(() => {
+    function onFullscreenChange() {
+      setIsFullscreen(document.fullscreenElement === previewCardRef.current)
+    }
+    document.addEventListener('fullscreenchange', onFullscreenChange)
+    return () => document.removeEventListener('fullscreenchange', onFullscreenChange)
+  }, [])
+
+  function toggleFullscreen() {
+    const el = previewCardRef.current
+    if (!el) return
+    if (document.fullscreenElement) {
+      document.exitFullscreen()
+    } else {
+      el.requestFullscreen?.()
+    }
+  }
+
+  function clearActiveProfile() {
+    localStorage.removeItem(ACTIVE_PROFILE_KEY)
+    setAppliedProfile(null)
+    setState(DEFAULT_ACCESSFLOW_STATE)
+  }
 
   // Resizable settings panel
   useEffect(() => {
@@ -170,6 +212,70 @@ export default function Sandbox() {
     URL.revokeObjectURL(anchor.href)
   }
 
+  function importJSON(event) {
+    const file = event.target.files?.[0]
+    event.target.value = ''
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = e => {
+      try {
+        const parsed = JSON.parse(e.target.result)
+        const t = parsed.typography || {}
+        const v = parsed.visual || {}
+        const r = parsed.reading || {}
+        const clamp = (n, min, max, fallback) => {
+          const num = Number(n)
+          return Number.isFinite(num) ? Math.min(max, Math.max(min, num)) : fallback
+        }
+        setState(current => ({
+          ...DEFAULT_ACCESSFLOW_STATE,
+          preset: parsed.preset && ACCESSFLOW_PRESETS[parsed.preset] ? parsed.preset : 'none',
+          fontFamily: ['default', 'opendyslexic', 'system'].includes(t.fontFamily) ? t.fontFamily : current.fontFamily,
+          fontSize: clamp(t.fontSize, 12, 24, current.fontSize),
+          letterSpacing: clamp(t.letterSpacing, 0, 6, current.letterSpacing),
+          lineHeight: clamp(t.lineHeight, 1.2, 2.5, current.lineHeight),
+          contrastMode: ['normal', 'high', 'dark'].includes(v.contrastMode) ? v.contrastMode : 'normal',
+          focusMode: !!v.focusMode,
+          highlightLinks: !!v.highlightLinks,
+          removeAnimations: !!v.removeAnimations,
+          readingRuler: !!r.readingRuler,
+          readingProgress: !!r.readingProgress,
+        }))
+        setImportStatus('ok')
+      } catch {
+        setImportStatus('error')
+      }
+      window.setTimeout(() => setImportStatus('idle'), 3000)
+    }
+    reader.readAsText(file)
+  }
+
+  async function saveProfile() {
+    const name = saveName.trim()
+    if (!name) return
+    const token = localStorage.getItem('token')
+    if (!token) {
+      setSaveStatus('unauth')
+      return
+    }
+    setSaveStatus('saving')
+    try {
+      const res = await fetch(`${API_URL}/profiles`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify(accessflowStateToProfile(state, name)),
+      })
+      if (res.status === 401) { setSaveStatus('unauth'); return }
+      if (!res.ok) { setSaveStatus('error'); return }
+      setSaveStatus('ok')
+      setSaveName('')
+      setShowSave(false)
+      window.setTimeout(() => setSaveStatus('idle'), 3000)
+    } catch {
+      setSaveStatus('error')
+    }
+  }
+
   function onViewportScroll() {
     const viewport = viewportRef.current
     if (!viewport || !state.readingProgress || renderTarget.mode !== 'demo') return
@@ -179,7 +285,7 @@ export default function Sandbox() {
 
   return (
     <div className="ae-sandbox-view" onMouseMove={event => setMouseY(event.clientY - 18)}>
-      {state.readingRuler && <div className="ae-reading-ruler" aria-hidden="true" style={{ display: 'block', top: mouseY }} />}
+      {state.readingRuler && renderTarget.mode === 'demo' && <div className="ae-reading-ruler" aria-hidden="true" style={{ display: 'block', top: mouseY }} />}
 
       <header className="ae-topbar">
         <div className="ae-topbar-left">
@@ -187,8 +293,23 @@ export default function Sandbox() {
           <div className="ae-live-badge"><span className="ae-live-dot" />Ambiente ao vivo</div>
         </div>
         <div className="ae-topbar-right">
-          <button className="ae-icon-btn" aria-label="Configurações"><span className="material-symbols-outlined">settings</span></button>
-          <button className="ae-icon-btn" aria-label="Conta"><span className="material-symbols-outlined">account_circle</span></button>
+          <div className="ae-help">
+            <button
+              className="ae-icon-btn"
+              aria-label="Ajuda"
+              aria-expanded={showHelp}
+              onClick={() => setShowHelp(open => !open)}
+            >
+              <span className="material-symbols-outlined">help</span>
+            </button>
+            {showHelp && (
+              <div className="ae-help-bubble" role="dialog" aria-label="Como usar o Sandbox" style={{ width: 280, right: 0, left: 'auto', transform: 'none' }}>
+                Use o painel à esquerda para simular necessidades de leitura. Cole uma URL ou HTML
+                para testar em páginas reais, ative um perfil em "Meus Perfis" ou use o botão de
+                tela cheia (na barra de URL) para ver o preview ampliado.
+              </div>
+            )}
+          </div>
         </div>
       </header>
 
@@ -231,8 +352,7 @@ export default function Sandbox() {
                 <div className="ae-segment">
                   {[
                     ['normal', 'Normal'],
-                    ['high', 'Alto'],
-                    ['dark', 'Escuro'],
+                    ['high', 'Alto']
                   ].map(([value, label]) => (
                     <button
                       className={`ae-segment-btn ${state.contrastMode === value ? 'active' : ''}`}
@@ -256,7 +376,41 @@ export default function Sandbox() {
           </div>
 
           <div className="ae-settings-footer">
-            <button className="ae-btn-export" onClick={exportJSON}><span className="material-symbols-outlined">data_object</span>Exportar JSON</button>
+            {showSave ? (
+              <div className="ae-save-profile">
+                <input
+                  className="ae-save-input"
+                  type="text"
+                  value={saveName}
+                  onChange={e => setSaveName(e.target.value)}
+                  placeholder="Nome do perfil"
+                  aria-label="Nome do novo perfil"
+                  onKeyDown={e => { if (e.key === 'Enter') saveProfile() }}
+                  autoFocus
+                />
+                <button className="ae-go-btn" type="button" disabled={!saveName.trim() || saveStatus === 'saving'} onClick={saveProfile}>
+                  {saveStatus === 'saving' ? 'Salvando…' : 'Salvar'}
+                </button>
+                <button className="ae-btn-reset" type="button" onClick={() => { setShowSave(false); setSaveStatus('idle') }}>Cancelar</button>
+              </div>
+            ) : (
+              <button className="ae-btn-export" onClick={() => { setShowSave(true); setSaveStatus('idle') }}>
+                <span className="material-symbols-outlined">bookmark_add</span>Salvar como perfil
+              </button>
+            )}
+
+            {saveStatus === 'ok' && <p className="ae-footer-msg ok">Perfil salvo! Veja em "Meus Perfis".</p>}
+            {saveStatus === 'error' && <p className="ae-footer-msg err">Não foi possível salvar o perfil.</p>}
+            {saveStatus === 'unauth' && <p className="ae-footer-msg err">Faça login para salvar perfis.</p>}
+
+            <div className="ae-footer-row">
+              <button className="ae-btn-export" onClick={exportJSON}><span className="material-symbols-outlined">data_object</span>Exportar JSON</button>
+              <button className="ae-btn-export" onClick={() => importInputRef.current?.click()}><span className="material-symbols-outlined">upload_file</span>Importar JSON</button>
+            </div>
+            <input ref={importInputRef} type="file" accept=".json,application/json" style={{ display: 'none' }} onChange={importJSON} />
+            {importStatus === 'ok' && <p className="ae-footer-msg ok">Configuração importada.</p>}
+            {importStatus === 'error' && <p className="ae-footer-msg err">Arquivo JSON inválido.</p>}
+
             <button className="ae-btn-reset" onClick={resetState}>Restaurar padrões</button>
           </div>
         </aside>
@@ -274,7 +428,16 @@ export default function Sandbox() {
         </div>
 
         <section className="ae-preview">
-          <div className="ae-preview-card">
+          <div className="ae-preview-card" ref={previewCardRef}>
+            {appliedProfile && (
+              <div className="ae-active-profile">
+                <div className="ae-active-profile-left">
+                  <span className="material-symbols-outlined">badge</span>
+                  <span>Perfil <strong>{appliedProfile}</strong> aplicado ao preview</span>
+                </div>
+                <button className="ae-active-profile-clear" onClick={clearActiveProfile}>Limpar</button>
+              </div>
+            )}
             <form className="ae-url-bar" onSubmit={handleSubmit}>
               <div className="ae-url-input-wrap">
                 <span className="material-symbols-outlined">public</span>
@@ -282,6 +445,16 @@ export default function Sandbox() {
               </div>
               <button className="ae-demo-btn" type="button" onClick={() => { setInput(''); setRenderTarget({ mode: 'demo', url: '', srcDoc: '' }) }}>Exemplo</button>
               <button className="ae-go-btn" type="submit">Renderizar</button>
+              <button
+                className="ae-fullscreen-btn"
+                type="button"
+                aria-label={isFullscreen ? 'Sair da tela cheia' : 'Renderizar em tela cheia'}
+                aria-pressed={isFullscreen}
+                title={isFullscreen ? 'Sair da tela cheia' : 'Tela cheia'}
+                onClick={toggleFullscreen}
+              >
+                <span className="material-symbols-outlined">{isFullscreen ? 'fullscreen_exit' : 'fullscreen'}</span>
+              </button>
             </form>
 
             <div className={`ae-viewport contrast-${state.contrastMode}`} ref={viewportRef} onScroll={onViewportScroll}>
@@ -360,13 +533,37 @@ function Toggle({ icon, label, tip, checked, onChange }) {
       <div className="ae-toggle-label">
         <span className="material-symbols-outlined ae-toggle-icon">{icon}</span>
         <span>{label}</span>
-        <span className="material-symbols-outlined ae-info-icon" title={tip}>info</span>
+        <HelpTip text={tip} label={`Ajuda: ${label}`} />
       </div>
       <label className="ae-switch">
         <input type="checkbox" checked={checked} onChange={event => onChange(event.target.checked)} />
         <div className="ae-track" />
       </label>
     </div>
+  )
+}
+
+function HelpTip({ text, label }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <span
+      className="ae-help"
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+    >
+      <button
+        type="button"
+        className="ae-help-btn"
+        aria-label={label}
+        aria-expanded={open}
+        title={text}
+        onFocus={() => setOpen(true)}
+        onBlur={() => setOpen(false)}
+      >
+        <span className="material-symbols-outlined">help</span>
+      </button>
+      {open && <span className="ae-help-bubble" role="tooltip">{text}</span>}
+    </span>
   )
 }
 

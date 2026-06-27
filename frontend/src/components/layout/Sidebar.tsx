@@ -22,7 +22,7 @@ const NAV_LINKS: NavLink[] = [
   { id: 'landing', section: 'howworks', icon: 'help', label: 'Como funciona', tooltip: 'Como funciona' },
   { id: 'sandbox', section: '', icon: 'science', label: 'Sandbox', tooltip: 'Sandbox' },
   { id: 'changelog', section: '', icon: 'history', label: 'Changelog', tooltip: 'Changelog' },
-  { id: 'difficulty-profile', section: '', icon: 'tune', label: 'Perfil de Dificuldades', tooltip: 'Perfil de Dificuldades' },
+  { id: 'profiles', section: '', icon: 'badge', label: 'Meus Perfis', tooltip: 'Meus Perfis' },
 ]
 
 export default function Sidebar({ currentView, currentSection, onNavigate, collapsed, onToggleCollapse }: SidebarProps) {

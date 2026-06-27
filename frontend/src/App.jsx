@@ -6,12 +6,13 @@ import Register from './pages/Register.jsx'
 import Sandbox from './pages/Sandbox.jsx'
 import Changelog from './pages/Changelog.jsx'
 import DifficultyProfile from './pages/DifficultyProfile.jsx'
+import Profiles from './pages/Profiles.jsx'
 
 export default function App() {
   const [view, setView] = useState('landing')
   const [section, setSection] = useState(null)
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true)
   const [user, setUser] = useState(localStorage.getItem('userEmail') || null)
 
   function handleLogin(email) {
@@ -131,6 +132,7 @@ export default function App() {
         {view === 'register' && <Register onLogin={handleLogin} onNavigate={navigate} />}
         {view === 'sandbox' && <Sandbox />}
         {view === 'changelog' && <Changelog />}
+        {view === 'profiles' && <Profiles onNavigate={navigate} />}
         {view === 'difficulty-profile' && <DifficultyProfile />}
       </main>
     </>

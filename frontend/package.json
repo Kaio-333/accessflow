@@ -18,7 +18,10 @@
     "vite": "^5.4.0"
   },
   "dependencies": {
+    "@paper-design/shaders-react": "^0.0.76",
+    "framer-motion": "^12.42.0",
     "react": "^19.2.6",
-    "react-dom": "^19.2.6"
+    "react-dom": "^19.2.6",
+    "three": "^0.185.0"
   }
 }

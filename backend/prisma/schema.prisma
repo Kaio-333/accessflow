@@ -7,50 +7,27 @@ generator client {
   provider = "prisma-client-js"
 }
 
-enum Font{
-  DEFAULT
-  dyslexia
-  Sistema
-}
-
-enum Contrast{
-  Normal 
-  High 
-  Dark
-}
-
-
 datasource db {
   provider = "postgresql"
 }
 
 model Profile {
-  id                  Int     @id @default(autoincrement())
-  name                String
+  id          Int     @id @default(autoincrement())
+  name        String
 
-  font                Font
-  size_font           Int
-  letter_spacing      Int
-  line_height         Int
-  contrast            Contrast
+  contrast    Int
+  font        Int
+  animations  Boolean
+  feedback    String
 
-  focus_mode          Boolean
-  highlight_links     Boolean
-  animations          Boolean
-  remove_animations   Boolean
-  reading_ruler       Boolean
-  reading_progress    Boolean
-
-  feedback            String
-  userId              Int
-  user                Users   @relation(fields: [userId], references: [id])
+  userId      Int
+  user        Users   @relation(fields: [userId], references: [id])
 }
 
 model Users {
   id       Int       @id @default(autoincrement())
   email    String    @unique
   password String
-  
+
   profile  Profile[]
 }
-
