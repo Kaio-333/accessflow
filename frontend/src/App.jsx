@@ -12,7 +12,7 @@ export default function App() {
   const [view, setView] = useState('landing')
   const [section, setSection] = useState(null)
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true)
   const [user, setUser] = useState(localStorage.getItem('userEmail') || null)
 
   function handleLogin(email) {
