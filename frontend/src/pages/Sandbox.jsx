@@ -352,8 +352,7 @@ export default function Sandbox() {
                 <div className="ae-segment">
                   {[
                     ['normal', 'Normal'],
-                    ['high', 'Alto'],
-                    ['dark', 'Escuro'],
+                    ['high', 'Alto']
                   ].map(([value, label]) => (
                     <button
                       className={`ae-segment-btn ${state.contrastMode === value ? 'active' : ''}`}
